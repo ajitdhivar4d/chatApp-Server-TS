@@ -4,11 +4,13 @@ import mongoose, {
   Document,
   Model,
   CallbackError,
+  Types,
 } from "mongoose";
 import { hash } from "bcrypt";
 
 // Define an interface for the User document
 export interface IUser extends Document {
+  _id: Types.ObjectId;
   name: string;
   bio: string;
   username: string;

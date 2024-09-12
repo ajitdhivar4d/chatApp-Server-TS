@@ -2,3 +2,11 @@
 export const getBase64 = (file) => {
     return `data:image/jpeg;base64,${file.toString("base64")}`;
 };
+// Function to get the other member in a chat who is not the current user
+export const getOtherMember = (members, userId) => {
+    const otherUser = members.find((member) => member._id.toString() !== userId.toString());
+    if (!otherUser) {
+        throw new Error("Other member not found in chat");
+    }
+    return otherUser;
+};

@@ -1,8 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { v4 as uuid } from "uuid";
 import { getBase64 } from "../lib/helper.js";
-import mongoose from "mongoose";
 // Upload multiple files to Cloudinary
 export const uploadFilesToCloudinary = async (files = []) => {
     // Create an array of promises for file uploads
@@ -38,7 +38,7 @@ export const uploadFilesToCloudinary = async (files = []) => {
     }
 };
 // Define the cookie options (example)
-const cookieOptions = {
+export const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production" ||
         process.env.NODE_ENV === "development",

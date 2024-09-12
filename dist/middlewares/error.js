@@ -28,12 +28,18 @@ const errorMiddleware = (err, req, res, next) => {
     return res.status(err.statusCode).json(response);
 };
 export default errorMiddleware;
-export const TryCatch = (passedFunc) => async (req, res, next) => {
-    try {
-        // Ensure that we handle both synchronous and asynchronous functions properly
-        await Promise.resolve(passedFunc(req, res, next));
-    }
-    catch (error) {
-        next(error);
-    }
+// export const TryCatch =
+//   (passedFunc: RequestHandler): RequestHandler =>
+//   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//     try {
+//       // Ensure that we handle both synchronous and asynchronous functions properly
+//       await Promise.resolve(passedFunc(req, res, next));
+//     } catch (error) {
+//       next(error);
+//     }
+//   };
+export const TryCatch = (fn) => {
+    return (req, res, next) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
 };

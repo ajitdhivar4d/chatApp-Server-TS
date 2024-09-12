@@ -1,10 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
 import { Response } from "express";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { v4 as uuid } from "uuid";
 import { getBase64 } from "../lib/helper.js";
 import { IUser } from "../models/user.js";
-import mongoose from "mongoose";
 
 // Upload multiple files to Cloudinary
 export const uploadFilesToCloudinary = async (
@@ -49,6 +49,10 @@ export const uploadFilesToCloudinary = async (
   }
 };
 
+// export const deleteFilesFromCloudinary = async (public_ids) => {
+//   // Delete files from cloudinary
+// };
+
 // Define the interface for the user object
 
 // Define the type for the cookie options if you have specific options
@@ -60,7 +64,7 @@ interface CookieOptions {
 }
 
 // Define the cookie options (example)
-const cookieOptions: CookieOptions = {
+export const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure:
     process.env.NODE_ENV === "production" ||

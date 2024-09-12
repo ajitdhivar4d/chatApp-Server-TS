@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Define a custom error type that extends the built-in Error type
 interface CustomError extends Error {
@@ -57,13 +57,21 @@ const errorMiddleware = (
 
 export default errorMiddleware;
 
-export const TryCatch =
-  (passedFunc: RequestHandler): RequestHandler =>
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      // Ensure that we handle both synchronous and asynchronous functions properly
-      await Promise.resolve(passedFunc(req, res, next));
-    } catch (error) {
-      next(error);
-    }
+// export const TryCatch =
+//   (passedFunc: RequestHandler): RequestHandler =>
+//   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//     try {
+//       // Ensure that we handle both synchronous and asynchronous functions properly
+//       await Promise.resolve(passedFunc(req, res, next));
+//     } catch (error) {
+//       next(error);
+//     }
+//   };
+
+export const TryCatch = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void> | void,
+) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
   };
+};
