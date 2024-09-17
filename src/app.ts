@@ -1,13 +1,15 @@
 import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { config as configDotenv } from "dotenv";
 import express, { Request, Response } from "express";
 import errorMiddleware from "./middlewares/error.js";
 import { connectDB } from "./utils/features.js";
 
-import userRoute from "./routes/user.js";
-import chatRoute from "./routes/chat.js";
+import { corsOptions } from "./constants/config.js";
 import adminRoute from "./routes/admin.js";
+import chatRoute from "./routes/chat.js";
+import userRoute from "./routes/user.js";
 
 // Load environment variables from the .env file
 configDotenv({
@@ -37,6 +39,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 //
 app.use("/api/v1/user", userRoute);

@@ -50,6 +50,7 @@ export const login = TryCatch(async (req, res, next) => {
     }
     // Send token after successful authentication
     sendToken(res, user, 200, `Welcome Back, ${user.name}`);
+    console.log("use Login");
 });
 // Controller to get the authenticated user's profile
 export const getMyProfile = TryCatch(async (req, res, next) => {
