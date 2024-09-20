@@ -361,6 +361,7 @@ export const getMyFriends = async (
   } else {
     return res.status(200).json({
       success: true,
+      message: "Friends fetched successfully",
       friends,
     });
   }
