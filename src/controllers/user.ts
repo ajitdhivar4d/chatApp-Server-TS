@@ -70,11 +70,7 @@ export const login = TryCatch(async (req, res, next) => {
   // Send token after successful authentication
   sendToken(res, user, 200, `Welcome Back, ${user.name}`);
 
-<<<<<<< HEAD
-  console.log("use Login")
-=======
   console.log("use Login");
->>>>>>> 81fba12 (update)
 });
 
 // Controller to get the authenticated user's profile
@@ -198,11 +194,6 @@ export const acceptFriendRequest = TryCatch(
 
     if (!request) return next(new ErrorHandler("Request not found", 404));
 
-<<<<<<< HEAD
-    // Check if accept is false, meaning reject the friend request
-    if (!accept) {
-      await request.deleteOne();
-=======
     if (!request.sender || !request.receiver) {
       console.error(
         "Accept Friend Request Handler: Sender or Receiver not populated",
@@ -236,7 +227,6 @@ export const acceptFriendRequest = TryCatch(
         "Accept Friend Request Handler: Friend request rejected",
         requestId,
       );
->>>>>>> 81fba12 (update)
       res.status(200).json({
         success: true,
         message: "Friend Request Rejected",
@@ -250,15 +240,6 @@ export const acceptFriendRequest = TryCatch(
       request.receiver._id.toString(),
     ];
 
-<<<<<<< HEAD
-    await Promise.all([
-      Chat.create({
-        members,
-        name: `${request.sender.name}-${request.receiver.name}`,
-      }),
-      request.deleteOne(),
-    ]);
-=======
     try {
       console.log(
         "Accept Friend Request Handler: Creating chat for members",
@@ -281,18 +262,13 @@ export const acceptFriendRequest = TryCatch(
       );
       return next(new ErrorHandler("Failed to accept friend request", 500));
     }
->>>>>>> 81fba12 (update)
 
     //  emitEvent(req, REFETCH_CHATS, members);
 
     res.status(200).json({
       success: true,
       message: "Friend Request Accepted",
-<<<<<<< HEAD
-      senderId: request.sender.toString(),
-=======
       senderId: request.sender._id.toString(),
->>>>>>> 81fba12 (update)
     });
   },
 );

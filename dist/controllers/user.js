@@ -149,8 +149,30 @@ export const acceptFriendRequest = TryCatch(async (req, res, next) => {
         .populate("receiver", "_id name");
     if (!request)
         return next(new ErrorHandler("Request not found", 404));
+    if (!request.sender || !request.receiver) {
+        console.error("Accept Friend Request Handler: Sender or Receiver not populated", {
+            sender: request.sender,
+            receiver: request.receiver,
+        });
+        return next(new ErrorHandler("Invalid request data", 400));
+    }
+    console.log("Accept Friend Request Handler: Populated request", {
+        sender: request.sender,
+        receiver: request.receiver,
+    });
+    // Authorization: Ensure the requester is the receiver of the friend request
+    if (request.receiver._id.toString() !== req.user?.toString()) {
+        console.error("Accept Friend Request Handler: Unauthorized action", {
+            requestReceiver: request.receiver._id,
+            authenticatedUser: req.user,
+        });
+        return next(new ErrorHandler("Unauthorized action", 403));
+    }
+    // Check if accept is false, meaning reject the friend request
     if (!accept) {
+        // Reject the friend request
         await request.deleteOne();
+        console.log("Accept Friend Request Handler: Friend request rejected", requestId);
         res.status(200).json({
             success: true,
             message: "Friend Request Rejected",
@@ -162,17 +184,26 @@ export const acceptFriendRequest = TryCatch(async (req, res, next) => {
         request.sender._id.toString(),
         request.receiver._id.toString(),
     ];
-    await Promise.all([
-        Chat.create({
-            members,
-            name: `${request.sender.name}-${request.receiver.name}`,
-        }),
-        request.deleteOne(),
-    ]);
+    try {
+        console.log("Accept Friend Request Handler: Creating chat for members", members);
+        await Promise.all([
+            Chat.create({
+                members,
+                name: `${request.sender.name}-${request.receiver.name}`,
+            }),
+            request.deleteOne(),
+        ]);
+        console.log("Accept Friend Request Handler: Chat created and request deleted successfully");
+    }
+    catch (error) {
+        console.error("Accept Friend Request Handler: Error during chat creation or request deletion", error);
+        return next(new ErrorHandler("Failed to accept friend request", 500));
+    }
+    //  emitEvent(req, REFETCH_CHATS, members);
     res.status(200).json({
         success: true,
         message: "Friend Request Accepted",
-        senderId: request.sender.toString(),
+        senderId: request.sender._id.toString(),
     });
 });
 export const getMyNotifications = TryCatch(async (req, res, next) => {

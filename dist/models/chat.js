@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Types } from "mongoose";
+import mongoose, { model, Schema, Types } from "mongoose";
 // Define the Mongoose schema for the Chat model
 const chatSchema = new Schema({
     name: {
@@ -12,7 +12,6 @@ const chatSchema = new Schema({
     },
     creator: {
         type: Types.ObjectId,
-        required: [true, "Creator is required"],
         ref: "User",
         index: true, // Index for faster querying
     },

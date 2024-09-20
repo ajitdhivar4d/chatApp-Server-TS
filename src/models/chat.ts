@@ -1,5 +1,4 @@
-import mongoose, { Schema, model, Types, Document, Model } from "mongoose";
-import { IUser } from "./user.js";
+import mongoose, { Document, model, Model, Schema, Types } from "mongoose";
 
 // Define the TypeScript interface for the Chat Document
 export interface IChat extends Document {
@@ -26,10 +25,6 @@ const chatSchema = new Schema<IChat>(
     },
     creator: {
       type: Types.ObjectId,
-<<<<<<< HEAD
-      required: [true, "Creator is required"],
-=======
->>>>>>> 81fba12 (update)
       ref: "User",
       index: true, // Index for faster querying
     },
