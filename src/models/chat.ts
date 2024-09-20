@@ -26,7 +26,10 @@ const chatSchema = new Schema<IChat>(
     },
     creator: {
       type: Types.ObjectId,
+<<<<<<< HEAD
       required: [true, "Creator is required"],
+=======
+>>>>>>> 81fba12 (update)
       ref: "User",
       index: true, // Index for faster querying
     },

@@ -149,7 +149,6 @@ export const acceptFriendRequest = TryCatch(async (req, res, next) => {
         .populate("receiver", "_id name");
     if (!request)
         return next(new ErrorHandler("Request not found", 404));
-    // Check if accept is false, meaning reject the friend request
     if (!accept) {
         await request.deleteOne();
         res.status(200).json({
@@ -170,7 +169,6 @@ export const acceptFriendRequest = TryCatch(async (req, res, next) => {
         }),
         request.deleteOne(),
     ]);
-    //  emitEvent(req, REFETCH_CHATS, members);
     res.status(200).json({
         success: true,
         message: "Friend Request Accepted",
