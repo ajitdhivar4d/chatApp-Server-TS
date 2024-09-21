@@ -5,11 +5,11 @@ export const getBase64 = (file) => {
 // Function to get the other member in a chat who is not the current user
 export const getOtherMember = (members, userId) => {
     if (!Array.isArray(members) || members.length < 2) {
-        throw new Error("Invalid members array. At least two members are required.");
+        return null;
     }
     const otherUser = members.find((member) => !member._id.equals(userId));
     if (!otherUser) {
-        throw new Error("Other member not found in chat");
+        return null;
     }
     return otherUser;
 };

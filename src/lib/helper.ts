@@ -10,17 +10,15 @@ export const getBase64 = (file: Buffer): string => {
 export const getOtherMember = (
   members: IUser[],
   userId: Types.ObjectId,
-): IUser => {
+): IUser | null => {
   if (!Array.isArray(members) || members.length < 2) {
-    throw new Error(
-      "Invalid members array. At least two members are required.",
-    );
+    return null;
   }
 
   const otherUser = members.find((member) => !member._id.equals(userId));
 
   if (!otherUser) {
-    throw new Error("Other member not found in chat");
+    return null;
   }
 
   return otherUser;
