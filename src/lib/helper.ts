@@ -11,9 +11,13 @@ export const getOtherMember = (
   members: IUser[],
   userId: Types.ObjectId,
 ): IUser => {
-  const otherUser = members.find(
-    (member) => member._id.toString() !== userId.toString(),
-  );
+  if (!Array.isArray(members) || members.length < 2) {
+    throw new Error(
+      "Invalid members array. At least two members are required.",
+    );
+  }
+
+  const otherUser = members.find((member) => !member._id.equals(userId));
 
   if (!otherUser) {
     throw new Error("Other member not found in chat");
