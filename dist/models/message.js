@@ -15,14 +15,6 @@ const messageSchema = new Schema({
     content: String,
     attachments: {
         type: [attachmentSchema], // Use the Attachment schema as a sub-schema
-        validate: {
-            validator: function (v) {
-                // Validate that there are attachments if required
-                // Example validation: Ensure there is at least one attachment
-                return v.length > 0;
-            },
-            message: "At least one attachment is required", // Custom error message
-        },
     },
     sender: {
         type: Types.ObjectId,

@@ -7,6 +7,7 @@ import User, { IUser } from "../models/user.js";
 import { fileToBuffer } from "../utils/bufferConversion.js";
 import {
   cookieOptions,
+  emitEvent,
   sendToken,
   uploadFilesToCloudinary,
 } from "../utils/features.js";
@@ -14,6 +15,7 @@ import { ErrorHandler } from "../utils/utility.js";
 import { Chat } from "./../models/chat.js";
 import { RequestModel } from "./../models/request.js";
 import { getOtherMember } from "../lib/helper.js";
+import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
 
 // Create a new user and save it to the database and save token in cookie
 export const newUser = TryCatch(async (req, res, next) => {
@@ -69,8 +71,6 @@ export const login = TryCatch(async (req, res, next) => {
 
   // Send token after successful authentication
   sendToken(res, user, 200, `Welcome Back, ${user.name}`);
-
-  console.log("use Login");
 });
 
 // Controller to get the authenticated user's profile
@@ -175,7 +175,12 @@ export const sendFriendRequest = TryCatch(async (req, res, next) => {
   });
 
   // Emit an event to notify the receiver of the new friend request
-  // emitEvent(req, NEW_REQUEST, [userId]);
+  const eventEmitted = emitEvent(req, NEW_REQUEST, [userId]);
+  if (eventEmitted) {
+    console.log("sendFriendRequest");
+  } else {
+    console.log("Event not emitted");
+  }
 
   res.status(200).json({
     success: true,
@@ -195,27 +200,11 @@ export const acceptFriendRequest = TryCatch(
     if (!request) return next(new ErrorHandler("Request not found", 404));
 
     if (!request.sender || !request.receiver) {
-      console.error(
-        "Accept Friend Request Handler: Sender or Receiver not populated",
-        {
-          sender: request.sender,
-          receiver: request.receiver,
-        },
-      );
       return next(new ErrorHandler("Invalid request data", 400));
     }
 
-    console.log("Accept Friend Request Handler: Populated request", {
-      sender: request.sender,
-      receiver: request.receiver,
-    });
-
     // Authorization: Ensure the requester is the receiver of the friend request
     if (request.receiver._id.toString() !== req.user?.toString()) {
-      console.error("Accept Friend Request Handler: Unauthorized action", {
-        requestReceiver: request.receiver._id,
-        authenticatedUser: req.user,
-      });
       return next(new ErrorHandler("Unauthorized action", 403));
     }
 
@@ -223,10 +212,7 @@ export const acceptFriendRequest = TryCatch(
     if (!accept) {
       // Reject the friend request
       await request.deleteOne();
-      console.log(
-        "Accept Friend Request Handler: Friend request rejected",
-        requestId,
-      );
+
       res.status(200).json({
         success: true,
         message: "Friend Request Rejected",
@@ -241,10 +227,6 @@ export const acceptFriendRequest = TryCatch(
     ];
 
     try {
-      console.log(
-        "Accept Friend Request Handler: Creating chat for members",
-        members,
-      );
       await Promise.all([
         Chat.create({
           members,
@@ -252,18 +234,11 @@ export const acceptFriendRequest = TryCatch(
         }),
         request.deleteOne(),
       ]);
-      console.log(
-        "Accept Friend Request Handler: Chat created and request deleted successfully",
-      );
     } catch (error) {
-      console.error(
-        "Accept Friend Request Handler: Error during chat creation or request deletion",
-        error,
-      );
       return next(new ErrorHandler("Failed to accept friend request", 500));
     }
 
-    //  emitEvent(req, REFETCH_CHATS, members);
+    emitEvent(req, REFETCH_CHATS, members);
 
     res.status(200).json({
       success: true,

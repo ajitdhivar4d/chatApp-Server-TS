@@ -169,8 +169,6 @@ export const removeMember = TryCatch(async (req, res, next) => {
     User.findById(userId, "name"),
   ]);
 
-  console.log(userThatWillBeRemoved);
-
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
   if (!chat.groupChat)
@@ -192,8 +190,6 @@ export const removeMember = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Group must have at least 3 members", 400));
 
   const allChatMembers = chat.members.map((i) => i.toString());
-
-  console.log(allChatMembers);
 
   chat.members = chat.members.filter(
     (member) => member.toString() !== userId.toString(),
@@ -257,8 +253,6 @@ export const leaveGroup = TryCatch(async (req, res, next) => {
     chat.save(),
   ]);
 
-  console.log(user);
-
   // emitEvent(req, ALERT, chat.members, {
   //   chatId,
   //   message: `User ${user.name} has left the group`,
@@ -272,17 +266,11 @@ export const leaveGroup = TryCatch(async (req, res, next) => {
 
 //
 export const sendAttachments = TryCatch(async (req, res, next) => {
-  const { chatId } = req.body;
+  const { chatId, content } = req.body;
 
   const files = req.files || [];
 
   const fileLength = Number(files.length);
-
-  if (fileLength < 1)
-    return next(new ErrorHandler("Please Upload Attachments", 400));
-
-  if (fileLength > 5)
-    return next(new ErrorHandler("Files Can't be more than 5", 400));
 
   const [chat, me] = await Promise.all([
     Chat.findById(chatId),
@@ -304,7 +292,7 @@ export const sendAttachments = TryCatch(async (req, res, next) => {
   if (!me) return next(new ErrorHandler("User not found", 404));
 
   const messageForDB = {
-    content: "",
+    content,
     attachments,
     sender: me._id,
     chat: chatId,
@@ -317,8 +305,6 @@ export const sendAttachments = TryCatch(async (req, res, next) => {
       name: me.name,
     },
   };
-
-  console.log(messageForRealTime);
 
   const message = await Message.create(messageForDB);
 
@@ -499,7 +485,6 @@ export const deleteChat = TryCatch(async (req, res, next) => {
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
   const members = chat.members;
-  console.log(members);
 
   // Validate authenticated user
   if (!req.user) {
